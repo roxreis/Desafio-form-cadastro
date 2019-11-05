@@ -1,61 +1,18 @@
-<?php include_once("variaveis.php")?>
-
 <?php   
     
+    include_once("config/conexao.php");
+
+
+    $db = conectarBanco();
+    $query = $db->query('SELECT * FROM Produtos');
+
+    $produtos = $query->fetchAll(PDO::FETCH_ASSOC);
+
+    $categVestuarios = ["Camisetas" , "Calças" , "Bones", "Ôculos"];
+  
+   /*  var_dump($produtos); */
+    
    
-
-    // criando função
-    function cadastrarProdutos($nomeVestuario, $precoVestuario, $descVestuario, $categVestuario, $quantVestuario, $imgVestuario){
-
-        $produtosVestuario = "produtosVestuario.json";
-
-        if (file_exists($produtosVestuario)) {
-            
-            // pegando dados do arquivo
-            $arquivo = file_get_contents($produtosVestuario);
-            // decodificando json
-            $produtos = json_decode($arquivo, true);
-
-            // adicionando produtos a array
-            $produtos[] = ["nome"=>$nomeVestuario, "preco"=>$precoVestuario, "desc"=>$descVestuario, "categ"=>$categVestuario, "quant"=>$quantVestuario, "img"=>$imgVestuario];
-
-            // tranformando em json
-            $json = json_encode($produtos);
-            
-         
-
-            // escrevendo no arquivo
-            $deuCerto = file_put_contents($produtosVestuario, $json);
-                if($deuCerto){
-                    return "Produto cadastrado!";
-                }else{
-                    return "Produto não cadastrado!";
-                }
-
-        }else{
-                $produtos = [];
-                $produtos[] = ["nome"=>$nomeVestuario, "preco"=>$precoVestuario, "desc"=>$descVestuario, "categ"=>$categVestuario, "quant"=>$quantVestuario, "img"=>$imgVestuario];
-                $json = json_encode($produtos);
-
-
-                $deuCerto = file_put_contents($produtosVestuario, $json);
-                    if($deuCerto) {
-                        return "Produto cadastrado!";
-                    }else{
-                        return "Produto não cadastrado!";
-                    }
-                
-
-
-
-        }
-
-
-
-
-
-
-    }
 
     if($_POST) {
         $nomeImg = $_FILES['img']['name'];
@@ -85,6 +42,7 @@
             <table class="table" action="" method="post"  enctype ="multipart/form-data">
                 <thead>
                     <tr>
+                        <th scope="col">Id</th>
                         <th scope="col">Nome</th>
                         <th scope="col">Categoria</th>
                         <th scope="col">Preço Unitário</th>
@@ -95,10 +53,11 @@
                 <tbody> 
                     <?php foreach($produtos as $produto):?> 
                         <tr>
+                            <td><?= $produto['id'] ?></td>
                             <td><?= $produto['nome']; ?></td>
-                            <td><?= $produto['categ']; ?></td>
-                            <td><?= 'R$'.$produto['preco']; ?></td>
-                            <td><?= $produto['quant']; ?></td>
+                            <td><?= $produto['categoria']; ?></td>
+                            <td><?= 'R$'." ".$produto['preco']; ?></td>
+                            <td><?= $produto['quantidade']; ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -117,20 +76,20 @@
                 </div>
                 <div class="form-group">
                     <label for="categ">Categoria</label>  
-                    <select name="categ">
-                    <?php foreach ($categVestuario as $categVestuario1): ?>
-                        <option value="<?php echo $categVestuario1?>"> <?php echo $categVestuario1 ?> </option>
+                    <select name="categoria">
+                    <?php foreach ($categVestuarios as $categVestuario): ?>
+                        <option value="<?php echo $categVestuario?>"> <?php echo $categVestuario ?> </option>
                     <?php endforeach; ?>
                    
                     </select>            
                 </div>
                 <div class="form-group">
-                    <label for="desc">Descrição</label>
-                    <input type="text" class= "form-control" name="desc" id="descProduto" rows="3">
+                    <label for="descricao">Descrição</label>
+                    <input type="text" class= "form-control" name="descricao" id="descProduto" rows="3">
                 </div>
                 <div class="form-group">
-                    <label for="quant">Quantidade</label>
-                    <input type="number" class="form-control" name="quant">             
+                    <label for="quantidade">Quantidade</label>
+                    <input type="number" class="form-control" name="quantidade">             
                 </div>
                 <div class="form-group">
                     <label for="preco">Preço</label>
